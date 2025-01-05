@@ -7,9 +7,11 @@ A very simple Python script for parsing pixel art SVGs and turning them into for
 Prerequisites: [Python 3](https://www.python.org/) and an understanding of forza-painter.
 1. Download `SVGtoForzaPainterJSON.py` from this repository and place it somewhere accessible (your Desktop, for example).
 2. Create or obtain an `.svg` file *containing rectangles imitating pixels.*
-3. Run the script. Either use the command line or run it like an executable.
-4. Provide it a path to a file when asked (or provide it through command line arguments).
-5. After running, a new `.json` file can be found in the same location as the script itself. Use as directed by forza-painter.
+4. Run the script. Either use the command line or run it like an executable.
+5. Provide it a path to a file when asked (or provide it through command line arguments).
+7. After running, a new `.json` file can be found in the same location as the script itself. Use as directed by forza-painter.
+
+It is the user's responsibility to ensure that their art does not contain more than 3000 pixels... if you intend for all of it to import.
 
 # Overview
 ### The Why
@@ -22,7 +24,7 @@ Using [Asesprite](https://www.aseprite.org/), one can export pixel art as an "id
 
 # Future Ideas
 - Rectangle optimization. Thinking of ways to reduce the number of same-colored pixels by making some pixels double the size, and so on.
-- Batch script alternative.
+- Batch script alternative to Python.
 
 # Acknowledgements
 - [forza-painter](https://github.com/forza-painter/forza-painter), duh!
