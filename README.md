@@ -20,6 +20,10 @@ Thinking in terms of "scalable" led right away to the `.svg` format: Scalable Ve
 
 Using [Asesprite](https://www.aseprite.org/), one can export pixel art as an "ideal `.svg`." **Pixel scale must be set to one (1).** From there, opening the `.svg` in the script included in this repository parses the `.svg` and creates a `.json` file containing the pixel information. Each pixel's position is adjusted to compensate for scaling in Forza. It Just Works™️.
 
+# Future Ideas
+- Rectangle optimization. Thinking of ways to reduce the number of same-colored pixels by making some pixels double the size, and so on.
+- Batch script alternative.
+
 # Acknowledgements
 - [forza-painter](https://github.com/forza-painter/forza-painter), duh!
 - [Igara Studio S.A.](https://www.aseprite.org/) for making the greatest pixel art software in all of the civilized world.
