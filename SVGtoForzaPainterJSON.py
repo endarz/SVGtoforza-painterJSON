@@ -114,7 +114,7 @@ for rect in svg_lines:
     # Get the x, y and hexadecimal color code from the rect.
     x = getRectXValue(rect)
     y = getRectYValue(rect)
-    hex_color = rect[rect.find('fill="') + 7 : rect.find('" /')]
+    hex_color = getRectColor(rect)
 
     # Adjust the x and y values so the squares are seamless at 0.01 scale.
     # Put the values in their respective places in the data list.
