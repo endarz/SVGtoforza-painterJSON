@@ -43,22 +43,6 @@ def getRectAsList(str):
             getRectColor(str)]
     return rect_list
 
-# For a rect as a list, convert it into a string of SVG.
-def svg(rect_list):
-    chunks = ['<rect ',
-               'x="',
-               rect_list[0].__str__(),
-               '" y="',
-               rect_list[1].__str__(),
-               '" width="',
-               rect_list[2].__str__(),
-               '" height="',
-               rect_list[3].__str__(),
-               '" fill="#',
-               rect_list[4],
-               '" />']
-    return ''.join(chunks)
-
 
 #
 # MAIN METHOD
@@ -127,12 +111,22 @@ match method_of_opt:
                 if line_1_y == line_2_y and line_1_color == line_2_color:
                     line_1_values = getRectAsList(line_1)   # Get line_1's values.
                     line_1_values[2] += 1                   # Increment width value by one.
-                    # DEBUG
-                    print(line_1_values)
-                    str = svg(line_1_values)
-                    exit()
-                    # END DEBUG
-                    line_1 = svg(line_1_values)             # Convert the values to an SVG string.
+
+                    # Create a new SVG string from the new values.
+                    # I tried to make this its own method, but Python didn't like it.
+                    chunks = ['<rect ',
+                                'x="',
+                                line_1_values[0].__str__(),
+                                '" y="',
+                                line_1_values[1].__str__(),
+                                '" width="',
+                                line_1_values[2].__str__(),
+                                '" height="',
+                                line_1_values[3].__str__(),
+                                '" fill="#',
+                                line_1_values[4],
+                                '" />']           
+                    line_1 = ''.join(chunks)
                     line_2 = svg_lines.pop()                # Get a new secondary line.
                 else:
                     optimized_lines.append(line_1)          # Append line_1. It cannot merge with line_2.
