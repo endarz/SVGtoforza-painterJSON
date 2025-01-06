@@ -47,25 +47,6 @@ svg.close()
 # Isolate the rectangles from the SVG.
 svg_lines = svg_lines[2:-1]
 
-# Optimization Phase
-
-# Create a working file to perform destructive optimizations in.
-
-
-# Choose what method to use for optimization.
-# Set to 0 to combine by row (horizontal optimization).
-# Set to 1 to combine by column (vertical optimization).
-method_of_opt = 0
-
-match method_of_opt:
-    case 0:
-        pass
-    case 1:
-        pass
-
-
-
-
 # Create the result JSON file.
 result = open(os.path.basename(file_path) + '.json', 'w')
 
