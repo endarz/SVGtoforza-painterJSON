@@ -82,15 +82,17 @@ if not file_path.endswith('.svg'):
     exit()
 
 
-# A valid SVG file has been given at this point. Next is the optimization phase.
-
 # Optimization phase.
 
-# Open the SVG and obtain its lines.
+# Open the SVG and put its lines in a list.
 svg = open(file_path, 'r')
-svg_lines = svg.readlines()
-svg_lines = svg_lines.reverse() # Reverse the list so that the list can be used like a stack.
-optimized_lines = []            # Optimized lines get appended here.
+svg_lines = []
+for line in svg.readlines():
+    svg_lines.append(line.strip())
+svg_lines.reverse()             # Reverse the list so that it can work like a stack.
+svg_lines = svg_lines[0:-2]     # Remove last two lines of metadata to get just rectangles and an ending tag.
+
+optimized_lines = []    # Optimized lines get appended here.
 
 # Choose what method to use for optimization.
 # Set to 0 to combine by row (horizontal optimization).
@@ -128,10 +130,6 @@ match method_of_opt:
         # If two rects share both an x-value AND a fill color,
         # combine them.
         pass
-
-
-# Isolate the rectangles from the SVG.
-svg_lines = svg_lines[2:-1]
 
 
 # Conversion to JSON phase.
