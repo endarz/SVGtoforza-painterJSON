@@ -36,21 +36,17 @@ if not file_path.endswith('.svg'):
     exit()
 
 
-# A valid SVG file has been given at this point.
-# Prepare for parsing.
+# A valid SVG file has been given at this point. Next is the optimization phase.
+
+# Optimization phase.
+
+# Create a temporary file to perform destructive operations on.
+temp = open(os.path.basename(file_path) + '.tmp', 'w')
 
 # Open the SVG and obtain its lines.
 svg = open(file_path, 'r')
 svg_lines = svg.readlines()
 svg.close()
-
-# Isolate the rectangles from the SVG.
-svg_lines = svg_lines[2:-1]
-
-# Optimization Phase
-
-# Create a working file to perform destructive optimizations in.
-
 
 # Choose what method to use for optimization.
 # Set to 0 to combine by row (horizontal optimization).
@@ -64,7 +60,11 @@ match method_of_opt:
         pass
 
 
+# Isolate the rectangles from the SVG.
+svg_lines = svg_lines[2:-1]
 
+
+# Conversion to JSON phase.
 
 # Create the result JSON file.
 result = open(os.path.basename(file_path) + '.json', 'w')
