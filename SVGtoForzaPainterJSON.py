@@ -9,6 +9,22 @@
 import sys
 import os.path
 
+# Helper methods.
+
+# For a rect SVG string, returns its x-value.
+def getRectXValue(str):
+    return str[rect.find('"') + 1 : rect.find('" y="')] # Some unhinged, absolutely mental string hacking going on here!!!
+
+# For a rect SVG string, returns its y-value.
+def getRectYValue(str):
+    return str[rect.find('y="') + 3 : rect.find('" w')]
+
+# For a rect SVG string, returns its fill color in hexadecimal.
+def getRectColor(str):
+    return str[rect.find('fill="') + 7 : rect.find('" /')]
+
+# Main method.
+
 # Get the path to a file.
 # If a path is not provided through args, ask the user for a path.
 if len(sys.argv) < 2:
@@ -46,7 +62,6 @@ temp = open(os.path.basename(file_path) + '.tmp', 'w')
 # Open the SVG and obtain its lines.
 svg = open(file_path, 'r')
 svg_lines = svg.readlines()
-svg.close()
 
 # Choose what method to use for optimization.
 # Set to 0 to combine by row (horizontal optimization).
@@ -55,8 +70,20 @@ method_of_opt = 0
 
 match method_of_opt:
     case 0:
-        pass
+        # Horizontal optimization.
+        # If two rects share both a y-value AND a fill color,
+        # combine them.
+
+        # Pop two lines from the list.
+        line_1 = svg_lines.pop(0)
+        line_2 = svg_lines.pop(0)
+
+        # Obtain 
+
     case 1:
+        # Vertical pass.
+        # If two rects share both an x-value AND a fill color,
+        # combine them.
         pass
 
 
@@ -85,8 +112,8 @@ result.write(header)
 i = 1
 for rect in svg_lines:
     # Get the x, y and hexadecimal color code from the rect.
-    x = rect[rect.find('"') + 1 : rect.find('" y="')]   # Some unhinged, absolutely mental string hacking going on here!!!
-    y = rect[rect.find('y="') + 3 : rect.find('" w')]
+    x = getRectXValue(rect)
+    y = getRectYValue(rect)
     hex_color = rect[rect.find('fill="') + 7 : rect.find('" /')]
 
     # Adjust the x and y values so the squares are seamless at 0.01 scale.
