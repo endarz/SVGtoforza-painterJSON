@@ -47,6 +47,24 @@ svg.close()
 # Isolate the rectangles from the SVG.
 svg_lines = svg_lines[2:-1]
 
+# Optimization Phase
+
+# Create a working file to perform destructive optimizations in.
+
+
+# Choose what method to use for optimization.
+# Set to 0 to combine by row (horizontal optimization).
+# Set to 1 to combine by column (vertical optimization).
+optimizer = 0
+
+if optimizer == 0:
+    # Placeholder.
+    pass
+if optimizer == 1:
+    # Placeholder.
+    pass
+
+
 # Create the result JSON file.
 result = open(os.path.basename(file_path) + '.json', 'w')
 
@@ -76,6 +94,8 @@ for rect in svg_lines:
     data[0] = x
     y = float(y) * 1.28
     data[1] = y
+
+    # TODO: Change this to support values >0.01 for horizontal and vertical runs.
     data[2] = 0.01
     data[3] = 0.01
 
