@@ -9,7 +9,9 @@
 import sys
 import os.path
 
-# Helper methods.
+#
+# HELPER METHODS
+#
 
 # For a rect SVG string, returns its x-value.
 def getRectXValue(str):
@@ -43,17 +45,24 @@ def getRectAsList(str):
 
 # For a rect as a list, convert it into a string of SVG.
 def svg(rect_list):
-    svg_str = '<rect ' + 'x="' + str(rect_list[0])
-    svg_str += '" y="' + str(rect_list[1])
-    svg_str += '" width="' + str(rect_list[2])
-    svg_str += '" height="' + str(rect_list[3])
-    svg_str += '" fill="#' + rect_list[4]
-    svg_str += '" />'
+    chunks = ['<rect ',
+               'x="',
+               rect_list[0].__str__(),
+               '" y="',
+               rect_list[1].__str__(),
+               '" width="',
+               rect_list[2].__str__(),
+               '" height="',
+               rect_list[3].__str__(),
+               '" fill="#',
+               rect_list[4],
+               '" />']
+    return ''.join(chunks)
 
-    return svg_str
 
-
-# Main method.
+#
+# MAIN METHOD
+#
 
 # Get the path to a file.
 # If a path is not provided through args, ask the user for a path.
@@ -81,8 +90,9 @@ if not file_path.endswith('.svg'):
           file_path + ' is not an .svg file. Either provide an .svg or give the file an extension.')
     exit()
 
-
-# Optimization phase.
+#
+# Optimization Phase
+#
 
 # Open the SVG and put its lines in a list.
 svg = open(file_path, 'r')
@@ -98,14 +108,13 @@ optimized_lines = []    # Optimized lines get appended here.
 # Set to 0 to combine by row (horizontal optimization).
 # Set to 1 to combine by column (vertical optimization).
 method_of_opt = 0
-
 match method_of_opt:
     case 0:
         # Horizontal optimization.
 
             # Pop two SVG lines from the list.
-            line_1 = svg_lines.pop()    # "Primary line." line_2 merges with it if possible.
-            line_2 = svg_lines.pop()    # "Secondary line." A potentially redundant line.
+            line_1 = svg_lines.pop()    # String that is the "primary line." line_2 merges with it if possible.
+            line_2 = svg_lines.pop()    # String that is the "secondary line," a potentially redundant line.
 
             while not line_2 == '</svg>':
                 # Get the y-value and color for both lines.
@@ -118,21 +127,33 @@ match method_of_opt:
                 if line_1_y == line_2_y and line_1_color == line_2_color:
                     line_1_values = getRectAsList(line_1)   # Get line_1's values.
                     line_1_values[2] += 1                   # Increment width value by one.
+                    # DEBUG
+                    print(line_1_values)
+                    str = svg(line_1_values)
+                    exit()
+                    # END DEBUG
                     line_1 = svg(line_1_values)             # Convert the values to an SVG string.
                     line_2 = svg_lines.pop()                # Get a new secondary line.
                 else:
                     optimized_lines.append(line_1)          # Append line_1. It cannot merge with line_2.
                     line_1 = line_2                         # line_2 becomes the "primary line"
                     line_2 = svg_lines.pop()                # Get a new secondary line.
-        
     case 1:
         # Vertical pass.
         # If two rects share both an x-value AND a fill color,
         # combine them.
         pass
 
+# DEBUG
+# Check to see that the optimized lines are, in fact, an optimized SVG.
+result = open(file_path + '.tmp', 'w')
+for line in optimized_lines:
+    result.write(line)
+exit()
 
-# Conversion to JSON phase.
+#
+# Conversion to JSON Phase
+#
 
 # Create the result JSON file.
 result = open(os.path.basename(file_path) + '.json', 'w')
@@ -144,7 +165,6 @@ type = 1048677                  # The "shape ID." This value is a square.
 data = [0, 0, 0, 0, 0, 0, 0]    # X position; Y position; scale X; scale Y; rotation; and two other values that I don't know.
 color = [255, 255, 255, 255]    # Red, Green, Blue and Alpha values
 score = 0.8008135               # Shape accuracy; used by forza-painter. :]
-
 
 # Begin the parsing process.
 result.write(header)
