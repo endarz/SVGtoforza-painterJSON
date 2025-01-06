@@ -55,14 +55,15 @@ svg_lines = svg_lines[2:-1]
 # Choose what method to use for optimization.
 # Set to 0 to combine by row (horizontal optimization).
 # Set to 1 to combine by column (vertical optimization).
-optimizer = 0
+method_of_opt = 0
 
-if optimizer == 0:
-    # Placeholder.
-    pass
-if optimizer == 1:
-    # Placeholder.
-    pass
+match method_of_opt:
+    case 0:
+        pass
+    case 1:
+        pass
+
+
 
 
 # Create the result JSON file.
