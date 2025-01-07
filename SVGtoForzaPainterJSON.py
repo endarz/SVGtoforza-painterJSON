@@ -82,7 +82,7 @@ if not file_path.endswith('.svg'):
 svg = open(file_path, 'r')
 svg_lines = []
 for line in svg.readlines():
-    svg_lines.append(line.strip())
+    svg_lines.append(line)
 svg_lines.reverse()             # Reverse the list so that it can work like a stack.
 svg_lines = svg_lines[0:-2]     # Remove last two lines of metadata to get just rectangles and an ending tag.
 
@@ -125,7 +125,7 @@ match method_of_opt:
                                 line_1_values[3].__str__(),
                                 '" fill="#',
                                 line_1_values[4],
-                                '" />']           
+                                '" />\n']           
                     line_1 = ''.join(chunks)
                     line_2 = svg_lines.pop()                # Get a new secondary line.
                 else:
@@ -140,10 +140,13 @@ match method_of_opt:
 
 # DEBUG
 # Check to see that the optimized lines are, in fact, an optimized SVG.
-result = open(file_path + '.tmp', 'w')
+result = open(os.path.basename(file_path) + '.tmp', 'w+')
 for line in optimized_lines:
+    print(line)
     result.write(line)
+result.close()
 exit()
+# END DEBUG
 
 #
 # Conversion to JSON Phase
