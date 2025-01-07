@@ -11,7 +11,7 @@ Prerequisites: [Python 3](https://www.python.org/) and an understanding of forza
 5. Provide it a path to a file when asked (or provide it through command line arguments).
 7. After running, a new `.json` file can be found in the same location as the script itself. Use as directed by forza-painter.
 
-It is the user's responsibility to ensure that their art does not contain more than 3000 pixels... if you intend for all of it to import.
+It is the user's responsibility to perform simple image optimizations, such as restricting color use to a limited palette or providing images with simple or transparent backgrounds, if they expect this tool to work properly.
 
 # Overview
 ### The Why
