@@ -111,12 +111,21 @@ match method_of_opt:
                 line_1_color = getRectColor(line_1)
                 line_2_color = getRectColor(line_2)
 
-                # If two rects share both a y-value and a fill color,
-                # and if the difference in x values is == 1,
-                # then combine them.
-                if line_1_y == line_2_y and line_1_color == line_2_color and (line_2_x - line_1_x) == 1:
+                # If the two pixels share a y-value and color, merge them.
+                if line_1_y == line_2_y and line_1_color == line_2_color:
+
+                    # Begin checking ahead to find where transparency begins, if there is any.
+                    # This 'count' is stored in the variable below.
+                    # It gets added to line_1's width once the search ahead ends.
+                    # To detect transparency, the variable 'prev_line_x' stores line_2's last x position.
+                    count = 0
+                    while not line_2 == '</svg>' and line_1_y == line_2_y and line_1_color == line_2_color and (getRectXValue(line_2) - prev_line_x) == 1:
+                        count += 1
+                        prev_line_x = getRectXValue(line_2)
+                        line_2 = svg_lines.pop()    # Get next pixel.
+
                     line_1_values = getRectAsList(line_1)   # Get line_1's values.
-                    line_1_values[2] += 1                   # Increment width value by one.
+                    line_1_values[2] += count               # Increment width value by count.
                     # Create a new SVG string from the new values.
                     # I tried to make this its own method, but Python didn't like it.
                     chunks = ['<rect ',
@@ -132,13 +141,18 @@ match method_of_opt:
                                 line_1_values[4],
                                 '" />\n']           
                     line_1 = ''.join(chunks)
-                    line_2 = svg_lines.pop()                # Get a new secondary line.
+
+                    # Edge case for if the ending SVG tag is caught during the transparency check.
+                    # See line 122.
+                    if line_2 == '</svg>': pass
+                    else:
+                        line_2 = svg_lines.pop()                # Get a new secondary line.
                 else:
                     optimized_lines.append(line_1)          # Append line_1. It cannot merge with line_2.
                     line_1 = line_2                         # line_2 becomes the "primary line"
                     line_2 = svg_lines.pop()                # Get a new secondary line.
     case 1:
-        # Vertical pass.
+        # Vertical pass. Has not been implemented yet.
         # If two rects share both an x-value AND a fill color,
         # combine them.
         pass
