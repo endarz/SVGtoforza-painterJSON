@@ -138,22 +138,12 @@ match method_of_opt:
         # combine them.
         pass
 
-# DEBUG
-# Check to see that the optimized lines are, in fact, an optimized SVG.
-result = open(os.path.basename(file_path) + '.tmp', 'w+')
-for line in optimized_lines:
-    print(line)
-    result.write(line)
-result.close()
-exit()
-# END DEBUG
-
 #
 # Conversion to JSON Phase
 #
 
 # Create the result JSON file.
-result = open(os.path.basename(file_path) + '.json', 'w')
+result = open(os.path.basename(file_path) + '.json', 'w+')
 
 # Prepare values for creating the JSON.
 header = '{"shapes":\n['
@@ -168,22 +158,22 @@ result.write(header)
 
 # Parse each rect in the SVG file. Turn it into a JSON line.
 i = 1
-for line in svg_lines:
+for line in optimized_lines:
     # Get the x, y and hexadecimal color code from the rect.
     x = getRectXValue(line)
     y = getRectYValue(line)
     hex_color = getRectColor(line)
 
-    # Adjust the x and y values so the squares are seamless at 0.01 scale.
+    # Adjust the x and y values so the rectangles are seamless at 0.01 scale.
     # Put the values in their respective places in the data list.
-    x = float(x) * 1.28
+    x = (float(x) * 1.28) + ((getRectWidth(line) * 1.28) / 2)
     data[0] = x
-    y = float(y) * 1.28
+    y = (float(y) * 1.28) + ((getRectHeight(line) * 1.28) / 2)
     data[1] = y
 
-    # TODO: Change this to support values >0.01 for horizontal and vertical runs.
-    data[2] = 0.01
-    data[3] = 0.01
+    # Set width and height of rectangle.
+    data[2] = 0.01 * getRectWidth(line)
+    data[3] = 0.01 * getRectHeight(line)
 
     # Convert hex color to RGB values.
     color[0] = int(hex_color[0:2], 16)
@@ -198,7 +188,7 @@ for line in svg_lines:
     result.write('"score":' + str(score))
     result.write('}')
     # Decide if the end of the JSON has been reached.
-    if i < len(svg_lines):
+    if i < len(optimized_lines):
         result.write(',\n')
     i += 1
 
