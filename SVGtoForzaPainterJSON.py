@@ -112,14 +112,11 @@ match method_of_opt:
                 line_2_color = getRectColor(line_2)
 
                 # If two rects share both a y-value and a fill color,
-                # and if the difference in x values is not > 1,
+                # and if the difference in x values is == 1,
                 # then combine them.
-                if line_1_y == line_2_y:
-                    if line_1_color == line_2_color:
-                        if not (line_2_x - line_1_x) > 1:
-                            line_1_values = getRectAsList(line_1)   # Get line_1's values.
-                            line_1_values[2] += 1                   # Increment width value by one.
-
+                if line_1_y == line_2_y and line_1_color == line_2_color and (line_2_x - line_1_x) == 1:
+                    line_1_values = getRectAsList(line_1)   # Get line_1's values.
+                    line_1_values[2] += 1                   # Increment width value by one.
                     # Create a new SVG string from the new values.
                     # I tried to make this its own method, but Python didn't like it.
                     chunks = ['<rect ',
