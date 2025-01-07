@@ -101,16 +101,24 @@ match method_of_opt:
             line_2 = svg_lines.pop()    # String that is the "secondary line," a potentially redundant line.
 
             while not line_2 == '</svg>':
-                # Get the y-value and color for both lines.
+                # Get x values.
+                line_1_x = getRectXValue(line_1)
+                line_2_x = getRectXValue(line_2)
+                # Get y values.
                 line_1_y = getRectYValue(line_1)
                 line_2_y = getRectYValue(line_2)
+                # Get colors.
                 line_1_color = getRectColor(line_1)
                 line_2_color = getRectColor(line_2)
 
-                # If two rects share both a y-value AND a fill color, combine them.
-                if line_1_y == line_2_y and line_1_color == line_2_color:
-                    line_1_values = getRectAsList(line_1)   # Get line_1's values.
-                    line_1_values[2] += 1                   # Increment width value by one.
+                # If two rects share both a y-value and a fill color,
+                # and if the difference in x values is not > 1,
+                # then combine them.
+                if line_1_y == line_2_y:
+                    if line_1_color == line_2_color:
+                        if not (line_2_x - line_1_x) > 1:
+                            line_1_values = getRectAsList(line_1)   # Get line_1's values.
+                            line_1_values[2] += 1                   # Increment width value by one.
 
                     # Create a new SVG string from the new values.
                     # I tried to make this its own method, but Python didn't like it.
