@@ -13,29 +13,38 @@ import os.path
 # HELPER METHODS
 #
 
-# For a rect SVG string, returns its x-value.
+# For an SVG string representing a rectangle, returns its x-value.
 def getRectXValue(str):
     # Some unhinged, absolutely mental string hacking going on here!!!
     return int(str[str.find('"') + 1 : str.find('" y="')])
 
-# For a rect SVG string, returns its y-value.
+# For an SVG string representing a rectangle, returns its y-value.
 def getRectYValue(str):
     return int(str[str.find('y="') + 3 : str.find('" w')])
 
-# For a rect SVG string, returns its width value.
+# For an SVG string representing a rectangle, return its width.
+# (Alias for getSVGWidth() because they do the same thing.)
 def getRectWidth(str):
-    return int(str[str.find('width="') + 7 : str.find('" h')])
+    return getSVGWidth(str)
 
-# For a rect SVG string, returns its height value.
+# For an SVG string representing a rectangle returns its height value.
 def getRectHeight(str):
     return int(str[str.find('height="') + 8 : str.find('" f')])
 
-# For a rect SVG string, returns its fill color in hexadecimal.
+# For an SVG string representing a rectangle, returns its fill color in hexadecimal.
 def getRectColor(str):
     return str[str.find('fill="#') + 7 : str.find('" /')]
 
-# For a rect SVG string, return a list representing a rect object.
-def getRectAsList(str):
+# For an SVG string, returns its width value.
+def getSVGWidth(str):
+    return int(str[str.find('width="') + 7 : str.find('" h')])
+
+# For an SVG string, returns its height value.
+def getSVGHeight(str):
+    return int(str[str.find('height="') + 8 : str.find('" x')])
+
+# For an SVG string representing a rectangle, return a list representing a rect object.
+def rectLineToList(str):
     rect_list = [getRectXValue(str),
             getRectYValue(str),
             getRectWidth(str),
@@ -83,9 +92,40 @@ svg = open(file_path, 'r')
 svg_lines = []
 for line in svg.readlines():
     svg_lines.append(line)
-svg_lines.reverse()             # Reverse the list so that it can work like a stack.
-svg_lines = svg_lines[0:-2]     # Remove last two lines of metadata to get just rectangles and an ending tag.
+svg.close()
+svg_lines.reverse() # Reverse the list of svg_lines to use it like a stack in Python.
 
+# Creating the pixel grid.
+#
+# Get the image's dimensions from the second line of metadata.
+svg_lines.pop()     # Pop first line because it's redundant.
+
+# Create a two-dimensional list to represent the pixels in the SVG.
+pixel_grid = []
+x = int(getSVGWidth(svg_lines[-1]))
+y = int(getSVGHeight(svg_lines[-1]))
+for i in range(y):
+    pixel_grid.append([None] * x)
+
+svg_lines.pop()             # Pop second line because it's no longer needed.
+                            # svg_lines now contains rectangles and an ending </svg> tag.
+svg_lines = svg_lines[1:]   # Remove the </svg> tag at the bottom of the stack.
+
+# Populate the pixel grid, end to front (because the lines were reversed).
+count = 0
+for line in svg_lines:
+    count += 1
+    rect = rectLineToList(line)
+    print(rect)
+    pixel_grid[rect[1]][rect[0]] = rect
+    print('Placed rect ' + str(count) + ' at X: ' + str(rect[0]) + ', Y: ' + str(rect[1]) + '.')
+
+exit("Finished.")
+
+
+
+
+"""
 optimized_lines = []    # Optimized lines get appended here.
 
 # Choose what method to use for optimization.
@@ -111,21 +151,16 @@ match method_of_opt:
                 line_1_color = getRectColor(line_1)
                 line_2_color = getRectColor(line_2)
 
-                # If the two pixels share a y-value and color, merge them.
+                count = 0
+                # If the two pixels share a y-value and color, prepare to look ahead.
                 if line_1_y == line_2_y and line_1_color == line_2_color:
+                    count += 1
+                    prev_x = line_2_x
+                    line_2 = svg_lines.pop()
 
-                    # Begin checking ahead to find where transparency begins, if there is any.
-                    # This 'count' is stored in the variable below.
-                    # It gets added to line_1's width once the search ahead ends.
-                    # To detect transparency, the variable 'prev_line_x' stores line_2's last x position.
-                    count = 0
-                    while not line_2 == '</svg>' and line_1_y == line_2_y and line_1_color == line_2_color and (getRectXValue(line_2) - prev_line_x) == 1:
-                        count += 1
-                        prev_line_x = getRectXValue(line_2)
-                        line_2 = svg_lines.pop()    # Get next pixel.
 
                     line_1_values = getRectAsList(line_1)   # Get line_1's values.
-                    line_1_values[2] += count               # Increment width value by count.
+                    line_1_values[2] +=                # Increment width value by count.
                     # Create a new SVG string from the new values.
                     # I tried to make this its own method, but Python didn't like it.
                     chunks = ['<rect ',
@@ -141,12 +176,8 @@ match method_of_opt:
                                 line_1_values[4],
                                 '" />\n']           
                     line_1 = ''.join(chunks)
+                    line_2 = svg_lines.pop()                # Get a new secondary line.
 
-                    # Edge case for if the ending SVG tag is caught during the transparency check.
-                    # See line 122.
-                    if line_2 == '</svg>': pass
-                    else:
-                        line_2 = svg_lines.pop()                # Get a new secondary line.
                 else:
                     optimized_lines.append(line_1)          # Append line_1. It cannot merge with line_2.
                     line_1 = line_2                         # line_2 becomes the "primary line"
@@ -217,3 +248,4 @@ result.write(trailer)
 result.close()
 
 print('Done! The result file has been placed in this script\'s directory.')
+"""
