@@ -83,17 +83,39 @@ if not file_path.endswith('.svg'):
           file_path + ' is not an .svg file. Either provide an .svg or give the file an extension.')
     exit()
 
-#
-# Optimization Phase
-#
-
 # Open the SVG and put its lines in a list.
 svg = open(file_path, 'r')
 svg_lines = []
 for line in svg.readlines():
     svg_lines.append(line)
 svg.close()
+
+# Is it empty?
+if len(svg_lines) == 0:
+    print('ERROR -- ' +
+          'The .svg given is empty and contains no lines.')
+    exit(1)
+
+# Are there any rects in the file (after omitting metadata)?
+for line in svg_lines[2 : len(svg_lines) - 1]:
+    if line == None:
+        print('ERROR -- '
+              + 'The .svg given contains no <rect> tags.')
+        exit(1)
+    if str(line).find('<rect') == -1:
+        print('ERROR -- '
+              + '\'' + str(line) + '\''
+              + ' is unexpected and cannot be accepted. Was this file exported from Asesprite?')
+        exit(1)
+    
+
+
+
 svg_lines.reverse() # Reverse the list of svg_lines to use it like a stack in Python.
+
+#
+# Preparation Phase
+#
 
 # Creating the pixel grid.
 #
@@ -116,11 +138,81 @@ count = 0
 for line in svg_lines:
     count += 1
     rect = rectLineToList(line)
-    print(rect)
     pixel_grid[rect[1]][rect[0]] = rect
-    print('Placed rect ' + str(count) + ' at X: ' + str(rect[0]) + ', Y: ' + str(rect[1]) + '.')
 
-exit("Finished.")
+#
+#   Optimization Phase
+#
+
+# Choose what method to use for optimization.
+# Set to 0 to combine by row (horizontal merging).
+# Set to 1 to combine by column (vertical merging).
+method_of_opt = 0
+match method_of_opt:
+    case 0:
+        # Horizontal merging.
+        #
+        # For each row in the pixel grid, use a primary pixel and a secondary pixel.
+        # Compare the secondary pixel to the primary pixel; if its color is the same
+        # as the primary pixel's color, then add one to the primary pixel's width
+        # and replace the secondary pixel with None in the pixel grid.
+        print('Starting horizontal merging...')
+        for row in pixel_grid:
+            print('Starting new row.')
+            for i in range(len(row)):
+                print(i)
+                pri_pix = row[i]
+                sec_pix = row[i + 1]
+                print(pri_pix)
+                print(sec_pix)
+                if pri_pix == None or sec_pix == None:  # If either of the pixels is a None...
+                    if i == len(row) - 2:   # Edge case: if the last pixel in the row is a none, leave this row.
+                        print('Last pixel in the row is None. Leaving this row...')
+                        break
+                    else:                   # Otherwise, go to the next iteration.
+                        print('One of the pixels is None. Reiterating...')
+                        continue
+                # Check if the secondary pixel's color matches primary pixel's color.
+                # If it does, then merge.
+                if sec_pix[4] == pri_pix[4]:
+                    print('Color match found, will merge.')
+                else:
+                    print('Color does not match, will not merge.')
+                while sec_pix[4] == pri_pix[4]:
+                    sys.stdout.write('Merging ')
+                    sys.stdout.write(str(pri_pix))
+                    sys.stdout.write(' with ')
+                    sys.stdout.write(str(sec_pix))
+                    print('')
+
+                    pri_pix[2] += 1                                 # Increment primary pixel's width by one.
+                    pixel_grid[pri_pix[1]][pri_pix[0]] = pri_pix    # Update primary pixel in the pixel grid.
+                    pixel_grid[sec_pix[1]][sec_pix[0]] = None       # Update secondary pixel in the pixel grid.
+                    row[sec_pix[0]] = None                          # Update secondary pixel in the row.
+
+                    print('Row:')
+                    print(row)
+                    # Check if the last pixel in the row just got merged.
+                    # If it did, then we need to leave and start a new row.
+                    if sec_pix[0] == len(row) - 1:
+                        print('Last pixel in the row just got merged.')
+                        break
+                    else:
+                        print('Getting next secondary pixel...')
+                        sec_pix = row[sec_pix[0] + 1]               # Get the pixel following the secondary pixel.
+                        if sec_pix == None:     # If the new secondary pixel is a None, exit the loop.
+                            break
+                if sec_pix == None or sec_pix[0] == len(row) - 1:
+                    break
+                    
+        print('Horizontal merging complete.')
+        print('Pixel grid:')
+        for row in pixel_grid:
+            print(row)
+    case 1:
+        pass
+
+exit("Script completed!")
 
 
 
