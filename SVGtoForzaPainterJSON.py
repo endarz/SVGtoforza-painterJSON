@@ -158,33 +158,50 @@ match method_of_opt:
         # and replace the secondary pixel with None in the pixel grid.
         print('Starting horizontal merging...')
         for row in pixel_grid:
+            #print('Row: ' + str(row))
             for i in range(len(row)):
+                #print('i: ' + str(i))
                 pri_pix = row[i]
                 sec_pix = row[i + 1]
+                #print('Primary pixel: ' + str(pri_pix))
+                #print('Secondary pixel: ' + str(sec_pix))
                 if pri_pix == None or sec_pix == None:  # If either of the pixels is a None...
                     if i == len(row) - 2:   # Edge case: if the last pixel in the row is a none, leave this row.
+                        #print('Last pixel in the row is a None. Leaving the row...')
                         break
                     else:                   # Otherwise, go to the next iteration.
+                        #print('One of the pixels is a None. Reiterating...')
                         continue
                 # Check if the secondary pixel's color matches primary pixel's color.
                 # If it does, then merge.
                 while sec_pix[4] == pri_pix[4]:
+                    #print('Color match found.')
+                    #print('Merging ' + str(sec_pix) + ' with ' + str(pri_pix))
                     pri_pix[2] += 1                                 # Increment primary pixel's width by one.
                     pixel_grid[pri_pix[1]][pri_pix[0]] = pri_pix    # Update primary pixel in the pixel grid.
                     pixel_grid[sec_pix[1]][sec_pix[0]] = None       # Update secondary pixel in the pixel grid.
                     row[sec_pix[0]] = None                          # Update secondary pixel in the row.
+                    #print('New pixel: ' + str(pri_pix))
+                    #print('Row: ' + str(row))
 
                     # Check if the last pixel in the row just got merged.
                     # If it did, then we need to leave and start a new row.
                     if sec_pix[0] == len(row) - 1:
+                        #print('Last pixel in the row just got merged. Leaving the row...')
                         break
                     else:
+                        #print('Getting new secondary pixel...')
                         sec_pix = row[sec_pix[0] + 1]               # Get the pixel following the secondary pixel.
+                        #print('New secondary: ' + str(sec_pix))
                         if sec_pix == None:                         # If the new secondary pixel is a None, exit the loop.
+                            #print('New secondary is a None. Exiting the merge loop...')
                             break
-                if sec_pix == None or sec_pix[0] == len(row) - 1:
+                if sec_pix == None:
+                    #print('The new secondary is a None. Reiterating...')
+                    continue
+                elif sec_pix[0] == len(row) - 1:
+                    #print('The end of the row has been reached. Leaving the row...')
                     break
-        print('Horizontal merging complete.')
     case 1:
         pass
 print('Merging complete.')
