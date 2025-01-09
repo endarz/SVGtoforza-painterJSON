@@ -200,7 +200,7 @@ match method_of_opt:
                     else:
                         print('Getting next secondary pixel...')
                         sec_pix = row[sec_pix[0] + 1]               # Get the pixel following the secondary pixel.
-                        if sec_pix == None:     # If the new secondary pixel is a None, exit the loop.
+                        if sec_pix == None:                         # If the new secondary pixel is a None, exit the loop.
                             break
                 if sec_pix == None or sec_pix[0] == len(row) - 1:
                     break
