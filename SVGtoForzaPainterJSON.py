@@ -3,7 +3,7 @@
 # via forza-painter.
 #
 # Created by endarz
-# Last edit: 1/6/2025
+# Last edit: 1/10/2025
 # Licenced under MIT License.
 
 import sys
@@ -147,9 +147,9 @@ for line in svg_lines:
 # Choose what method to use for optimization.
 # Set to 0 to combine by row (horizontal merging).
 # Set to 1 to combine by column (vertical merging).
-method_of_opt = 0
+method_of_opt = 1
 match method_of_opt:
-    case 0 | 1:
+    case 0:
         # Horizontal merging.
         #
         # For each row in the pixel grid, use a primary pixel and a secondary pixel.
@@ -158,6 +158,7 @@ match method_of_opt:
         # and replace the secondary pixel with None in the pixel grid.
 
         # For each row in the grid...
+        print('Starting horizontal merging...')
         for i in range(len(pixel_grid)):
             # For each value in the row...
             for j in range(len(pixel_grid[0])):
@@ -181,56 +182,31 @@ match method_of_opt:
                     continue
                 elif sec_pix[0] == len(pixel_grid[0]) - 1:  # If the end of the row has been reached, then move to the next row.
                     break
-
-        '''
-        for row in pixel_grid:
-            #print('Row: ' + str(row))
-            for j in range(len(pixel_grid[0])):
-                #print('i: ' + str(i))
-                pri_pix = row[j]
-                sec_pix = row[j + 1]
-                #print('Primary pixel: ' + str(pri_pix))
-                #print('Secondary pixel: ' + str(sec_pix))
-                if pri_pix == None or sec_pix == None:  # If either of the pixels is a None...
-                    if j == len(row) - 2:   # Edge case: if the last pixel in the row is a none, leave this row.
-                        #print('Last pixel in the row is a None. Leaving the row...')
-                        break
-                    else:                   # Otherwise, go to the next iteration.
-                        #print('One of the pixels is a None. Reiterating...')
-                        continue
-                # Check if the secondary pixel's color matches primary pixel's color.
-                # If it does, then merge.
-                while sec_pix[4] == pri_pix[4]:
-                    #print('Color match found.')
-                    #print('Merging ' + str(sec_pix) + ' with ' + str(pri_pix))
-                    pri_pix[2] += 1                                 # Increment primary pixel's width by one.
-                    pixel_grid[pri_pix[1]][pri_pix[0]] = pri_pix    # Update primary pixel in the pixel grid.
-                    pixel_grid[sec_pix[1]][sec_pix[0]] = None       # Update secondary pixel in the pixel grid.
-                    row[sec_pix[0]] = None                          # Update secondary pixel in the row.
-                    #print('New pixel: ' + str(pri_pix))
-                    #print('Row: ' + str(row))
-
-                    # Check if the last pixel in the row just got merged.
-                    # If it did, then we need to leave and start a new row.
-                    if sec_pix[0] == len(row) - 1:
-                        #print('Last pixel in the row just got merged. Leaving the row...')
-                        break
-                    else:
-                        #print('Getting new secondary pixel...')
-                        sec_pix = row[sec_pix[0] + 1]               # Get the pixel following the secondary pixel.
-                        #print('New secondary: ' + str(sec_pix))
-                        if sec_pix == None:                         # If the new secondary pixel is a None, exit the loop.
-                            #print('New secondary is a None. Exiting the merge loop...')
-                            break
-                if sec_pix == None:
-                    #print('The new secondary is a None. Reiterating...')
-                    continue
-                elif sec_pix[0] == len(row) - 1:
-                    #print('The end of the row has been reached. Leaving the row...')
-                    break
-            '''
     case 1:
-        pass
+        # Vertical merging
+        #
+        # Instead of merging pixels in the same row, merge pixels in the same column.
+        # Since much of this algorithm was copy/pasted from case 0, please see it for detailed comments.
+        print('Starting vertical merging...')
+        for i in range(len(pixel_grid[0])):
+            for j in range(len(pixel_grid)):
+                pri_pix = pixel_grid[j][i]      # Get values for primary and secondary pixels, except going down the columns this time.
+                sec_pix = pixel_grid[j + 1][i]
+                if pri_pix == None or sec_pix == None:
+                    if j == len(pixel_grid) - 2: break
+                    else: continue
+                while sec_pix[4] == pri_pix[4]:
+                    pri_pix[3] += 1     # Increment the HEIGHT instead of WIDTH this time.
+                    pixel_grid[pri_pix[1]][pri_pix[0]] = pri_pix
+                    pixel_grid[sec_pix[1]][sec_pix[0]] = None
+                    if sec_pix[1] == len(pixel_grid) - 1: break
+                    else:
+                        sec_pix = pixel_grid[sec_pix[1] + 1][i]
+                        if sec_pix == None: break
+                if sec_pix == None:
+                    continue
+                elif sec_pix[1] == len(pixel_grid) - 1:
+                    break
 print('Merging complete.')
 
 #
@@ -252,6 +228,9 @@ json_shapes = []                # Stores the shapes after they are converted to 
 
 # Begin the parsing process.
 result.write(header)
+
+# Reverse shapes to print in correct order.
+pixel_grid.reverse()
 
 # Parse each pixel in the pixel grid, turning it into JSON.
 for row in pixel_grid:
@@ -292,7 +271,7 @@ for row in pixel_grid:
             # Add to JSON shapes list.
             json_shapes.append(json)
 
-# Write json shapes to the file.
+# Write JSON shapes to the file.
 result.write(',\n'.join(json_shapes))
 
 # End the parsing process.
@@ -301,5 +280,6 @@ result.close()
 print('JSON file created at ' + os.getcwd() + os.path.basename(file_path) + '.json.')
 
 print('Done! The result file has been placed in this script\'s directory.')
+input('To exit the script, please close the window or hit ENTER.')
 
 exit(0)
