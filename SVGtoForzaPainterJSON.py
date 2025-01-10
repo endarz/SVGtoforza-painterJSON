@@ -149,24 +149,50 @@ for line in svg_lines:
 # Set to 1 to combine by column (vertical merging).
 method_of_opt = 0
 match method_of_opt:
-    case 0:
+    case 0 | 1:
         # Horizontal merging.
         #
         # For each row in the pixel grid, use a primary pixel and a secondary pixel.
         # Compare the secondary pixel to the primary pixel; if its color is the same
         # as the primary pixel's color, then add one to the primary pixel's width
         # and replace the secondary pixel with None in the pixel grid.
-        print('Starting horizontal merging...')
+
+        # For each row in the grid...
+        for i in range(len(pixel_grid)):
+            # For each value in the row...
+            for j in range(len(pixel_grid[0])):
+                pri_pix = pixel_grid[i][j]                  # Get values for primary and secondary pixels.
+                sec_pix = pixel_grid[i][j + 1]
+                if pri_pix == None or sec_pix == None:      # If either of the values is a None, then reiterate or potentially leave the row.
+                    if j == len(pixel_grid[i]) - 2: break   # Edge case: if this is the last pixel in the row, then leave this row.
+                    else: continue                          # Otherwise, reiterate.
+                # Check to see if the secondary pixel's color matches the primary pixel's color.
+                # If it does, then merge it with the primary.
+                # Do this until the secondary pixel is a None or does not match.
+                while sec_pix[4] == pri_pix[4]:
+                    pri_pix[2] += 1                                 # Increment primary pixel's width by one.
+                    pixel_grid[pri_pix[1]][pri_pix[0]] = pri_pix    # Update primary pixel in the pixel grid.
+                    pixel_grid[sec_pix[1]][sec_pix[0]] = None       # Replace secondary pixel in the pixel grid with None.
+                    if sec_pix[0] == len(pixel_grid[0]) - 1: break  # If the pixel just merged is the last pixel in the row, then leave the color merge loop.
+                    else:                                           # Otherwise, get a new secondary pixel.
+                        sec_pix = pixel_grid[i][sec_pix[0] + 1]     # Get the next secondary pixel.
+                        if sec_pix == None: break                   # If it is a None, then leave the color merge loop.
+                if sec_pix == None:     # If the secondary pixel is a None, then reiterate.
+                    continue
+                elif sec_pix[0] == len(pixel_grid[0]) - 1:  # If the end of the row has been reached, then move to the next row.
+                    break
+
+        '''
         for row in pixel_grid:
             #print('Row: ' + str(row))
-            for i in range(len(row)):
+            for j in range(len(pixel_grid[0])):
                 #print('i: ' + str(i))
-                pri_pix = row[i]
-                sec_pix = row[i + 1]
+                pri_pix = row[j]
+                sec_pix = row[j + 1]
                 #print('Primary pixel: ' + str(pri_pix))
                 #print('Secondary pixel: ' + str(sec_pix))
                 if pri_pix == None or sec_pix == None:  # If either of the pixels is a None...
-                    if i == len(row) - 2:   # Edge case: if the last pixel in the row is a none, leave this row.
+                    if j == len(row) - 2:   # Edge case: if the last pixel in the row is a none, leave this row.
                         #print('Last pixel in the row is a None. Leaving the row...')
                         break
                     else:                   # Otherwise, go to the next iteration.
@@ -202,6 +228,7 @@ match method_of_opt:
                 elif sec_pix[0] == len(row) - 1:
                     #print('The end of the row has been reached. Leaving the row...')
                     break
+            '''
     case 1:
         pass
 print('Merging complete.')
