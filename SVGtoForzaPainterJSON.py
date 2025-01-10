@@ -52,7 +52,8 @@ def rectLineToList(str):
             getRectColor(str)]
     return rect_list
 
-def optimizeShapes(method, pixel_grid):
+def optimizeShapes(method, pixel_grid_original):
+    pixel_grid = pixel_grid_original
     match method:
         case 0:
             # Horizontal merging.
@@ -203,33 +204,75 @@ for line in svg_lines:
 #   Optimization Phase
 #
 
-# Get the pixel grids for each of the optimization methods.
-pixel_grid_horiz_merge = optimizeShapes(0, pixel_grid)
-pixel_grid_vertical_merge = optimizeShapes(1, pixel_grid)
+method = int(input('Please specify what method of optimization to use:\n'
+               + '\t0 for Horizontal Merging,\n'
+               + '\t1 for Vertical Merging.\n'
+               + 'It is recommended to try both methods, as one will provide fewer layers than the other.\n\n'
+               + 'Method: '))
 
-# Determine which pixel grid has the most None values.
-# (more None values == fewer shapes == fewer layers)
-none_values = [0, 0]
-for x in none_values:
-    # Get horizontal values.
-    for row in pixel_grid_horiz_merge:
-        for val in row:
-            if val == None: x += 1
-    # Get vertical values.
-    for row in pixel_grid_vertical_merge:
-        for val in row:
-            if val == None: x += 1
+match method:
+        case 0:
+            # Horizontal merging.
+            #
+            # For each row in the pixel grid, use a primary pixel and a secondary pixel.
+            # Compare the secondary pixel to the primary pixel; if its color is the same
+            # as the primary pixel's color, then add one to the primary pixel's width
+            # and replace the secondary pixel with None in the pixel grid.
 
-if none_values[0] > none_values[1]:
-    print('Horizontal merging provided the fewest layers and will be used to generate the JSON.')
-    pixel_grid = pixel_grid_horiz_merge
-elif none_values[0] < none_values[1]:
-    print('Vertical merging provided the fewest layers and will be used to generate the JSON.')
-    pixel_grid = pixel_grid_vertical_merge
-else:
-    print('Horizontal merging and vertical merging provided the same number of layers and could not be optimized any further.\n'+
-          'The output from horizontal merging will be used by default.')
-    pixel_grid = pixel_grid_horiz_merge
+            # For each row in the grid...
+            print('Starting horizontal merging...')
+            for i in range(len(pixel_grid)):
+                # For each value in the row...
+                for j in range(len(pixel_grid[0])):
+                    pri_pix = pixel_grid[i][j]                  # Get values for primary and secondary pixels.
+                    sec_pix = pixel_grid[i][j + 1]
+                    if pri_pix == None or sec_pix == None:      # If either of the values is a None, then reiterate or potentially leave the row.
+                        if j == len(pixel_grid[i]) - 2: break   # Edge case: if this is the last pixel in the row, then leave this row.
+                        else: continue                          # Otherwise, reiterate.
+                    # Check to see if the secondary pixel's color matches the primary pixel's color.
+                    # If it does, then merge it with the primary.
+                    # Do this until the secondary pixel is a None or does not match.
+                    while sec_pix[4] == pri_pix[4]:
+                        pri_pix[2] += 1                                 # Increment primary pixel's width by one.
+                        pixel_grid[pri_pix[1]][pri_pix[0]] = pri_pix    # Update primary pixel in the pixel grid.
+                        pixel_grid[sec_pix[1]][sec_pix[0]] = None       # Replace secondary pixel in the pixel grid with None.
+                        if sec_pix[0] == len(pixel_grid[0]) - 1: break  # If the pixel just merged is the last pixel in the row, then leave the color merge loop.
+                        else:                                           # Otherwise, get a new secondary pixel.
+                            sec_pix = pixel_grid[i][sec_pix[0] + 1]     # Get the next secondary pixel.
+                            if sec_pix == None: break                   # If it is a None, then leave the color merge loop.
+                    if sec_pix == None:     # If the secondary pixel is a None, then reiterate.
+                        continue
+                    elif sec_pix[0] == len(pixel_grid[0]) - 1:  # If the end of the row has been reached, then move to the next row.
+                        break
+        case 1:
+            # Vertical merging
+            #
+            # Instead of merging pixels in the same row, merge pixels in the same column.
+            # Since much of this algorithm was copy/pasted from case 0, please see it for detailed comments.
+            print('Starting vertical merging...')
+            for i in range(len(pixel_grid[0])):
+                for j in range(len(pixel_grid)):
+                    pri_pix = pixel_grid[j][i]      # Get values for primary and secondary pixels, except going down the columns this time.
+                    sec_pix = pixel_grid[j + 1][i]
+                    if pri_pix == None or sec_pix == None:
+                        if j == len(pixel_grid) - 2: break
+                        else: continue
+                    while sec_pix[4] == pri_pix[4]:
+                        pri_pix[3] += 1     # Increment the HEIGHT instead of WIDTH this time.
+                        pixel_grid[pri_pix[1]][pri_pix[0]] = pri_pix
+                        pixel_grid[sec_pix[1]][sec_pix[0]] = None
+                        if sec_pix[1] == len(pixel_grid) - 1: break
+                        else:
+                            sec_pix = pixel_grid[sec_pix[1] + 1][i]
+                            if sec_pix == None: break
+                    if sec_pix == None:
+                        continue
+                    elif sec_pix[1] == len(pixel_grid) - 1:
+                        break
+        case _:
+            print('ERROR -- '
+                  + 'Invalid method value given.')
+            exit(1)
 
 print('Merging complete.')
 
@@ -239,7 +282,12 @@ print('Merging complete.')
 
 print('Starting JSON file generation...')
 # Create the result JSON file.
-result = open(os.path.basename(file_path) + '.json', 'w+')
+result_name = ''
+if method == 0:
+    result_name += os.path.basename(file_path) + '.horizontal.json'
+if method == 1:
+    result_name += os.path.basename(file_path) + '.vertical.json'
+result = open(result_name, 'w+')
 
 # Prepare values for creating the JSON.
 header = '{"shapes":\n['
@@ -301,7 +349,7 @@ result.write(',\n'.join(json_shapes))
 # End the parsing process.
 result.write(trailer)
 result.close()
-print('JSON file created at ' + os.getcwd() + os.path.basename(file_path) + '.json.')
+print('JSON file created at ' + os.getcwd() + result_name)
 
 print('Done! The result file has been placed in this script\'s directory.')
 input('To exit the script, please close the window or hit ENTER.')
