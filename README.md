@@ -20,11 +20,10 @@ This project was conceived and written in a day when I felt inspired to make a l
 ### The How
 Thinking in terms of "scalable" led right away to the `.svg` format: Scalable Vector Graphics. Incredibly simple and close to what Forza has anyways, but I still needed the art. Moreso, I needed software which would export each pixel's information as a square in an `.svg`. Further thinking led me to another feature of forza-painter: the ability to dump vinyl groups made in-game as `.json` files. Users can share these files with others out in the wild and import them through forza-painter. Thus, the connection was made: if I could get an ideal `.svg` where each pixel is a shape, I could convert it into a `.json` that forza-painter could import into Forza.
 
-Using [Asesprite](https://www.aseprite.org/), one can export pixel art as an "ideal `.svg`." **Pixel scale must be set to one (1).** From there, opening the `.svg` in the script included in this repository parses the `.svg` and creates a `.json` file containing the pixel information. Each pixel's position is adjusted to compensate for scaling in Forza. It Just Works™️.
+Using [Asesprite](https://www.aseprite.org/), one can export pixel art as an "ideal `.svg`." **Pixel scale must be set to one (1).** From there, opening the `.svg` in the script included in this repository parses the `.svg` and merges neighboring pixels of the same color into rectangles, greatly reducing the layer count. Thes script creates a `.json` file containing shape information as output. Each shape's position and scale is adjusted to the units used in the Forza vinyl editor. It Just Works™️.
 
 # Future Ideas
-- Rectangle optimization. Thinking of ways to reduce the number of same-colored pixels by making some pixels double the size, and so on.
-- Batch script alternative to Python.
+~~- Rectangle optimization. Thinking of ways to reduce the number of same-colored pixels by making some pixels double the size, and so on.~~ Added in Update #2.
 
 # Acknowledgements
 - [forza-painter](https://github.com/forza-painter/forza-painter), duh!
