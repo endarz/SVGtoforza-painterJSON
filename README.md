@@ -6,10 +6,16 @@ A very simple Python script for parsing pixel art SVGs and turning them into for
 # How to Use
 Prerequisites: [Python 3](https://www.python.org/) and an understanding of forza-painter.
 1. Download `SVGtoForzaPainterJSON.py` from this repository and place it somewhere accessible (your Desktop, for example).
-2. Create or obtain an `.svg` file *containing rectangles imitating pixels.*
-4. Run the script. Either use the command line or run it like an executable.
-5. Provide it a path to a file when asked (or provide it through command line arguments).
-7. After running, a new `.json` file can be found in the same location as the script itself. Use as directed by forza-painter.
+2. Create or obtain an `.svg` file containing `rect` objects, each one having a width and height no greater than 1.
+A valid example:
+```
+<rect x="33" y="0" width="1" height="1" fill="#5DD498" />
+```
+A valid `.svg` can be obtained using Asesprite or any tool that exports each pixel as a `rect`. **Plain SVGs, Inkscape SVGs, Affinity Designer SVGs or other tools WILL NOT WORK.** See `example.svg` in the repository for a valid file.
+
+3. Run the script. Either use the command line or run it like an executable.
+4. Provide it a path to a file when asked (or provide it through command line arguments).
+5. After running, a new `.json` file can be found in the same location as the script itself. Use as directed by forza-painter.
 
 It is the user's responsibility to perform simple image optimizations, such as restricting color use to a limited palette or providing images with simple or transparent backgrounds, if they expect this tool to work properly.
 
