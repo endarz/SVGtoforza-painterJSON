@@ -32,4 +32,3 @@ Using [Asesprite](https://www.aseprite.org/), one can export pixel art as an "id
 # Acknowledgements
 - [forza-painter](https://github.com/forza-painter/forza-painter), duh!
 - [Igara Studio S.A.](https://www.aseprite.org/) for making the greatest pixel art software in all of the civilized world.
-- [Mina Cream](https://x.com/MinaCreamu) for the art used in the screenshot.
