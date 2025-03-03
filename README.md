@@ -1,8 +1,6 @@
 # SVGtoforza-painterJSON
 A very simple Python script for parsing pixel art SVGs and turning them into forza-painter recognizable JSON files. Simple as.
 
-![image](https://github.com/user-attachments/assets/0969c068-3251-4bb4-8519-71898d303ed2)
-
 # How to Use
 Prerequisites: [Python 3](https://www.python.org/) and an understanding of forza-painter.
 1. Download `SVGtoForzaPainterJSON.py` from this repository and place it somewhere accessible (your Desktop, for example).
